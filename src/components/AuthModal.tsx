@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Loader2, Mail, Lock, Shield, Sparkles, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { Loader2, Mail, Lock, Shield, Sparkles, Eye, EyeOff, CheckCircle2, Check, X } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -24,6 +24,28 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [showSignupConfirm, setShowSignupConfirm] = useState(false);
+
+  // Password requirement validators
+  const hasLowercase = /[a-z]/.test(password);
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasNumbers = /[0-9]/.test(password);
+  const hasSpecialChars = /[!@#$%^&*]/.test(password);
+  const allRequirementsMet = hasLowercase && hasUppercase && hasNumbers && hasSpecialChars;
+
+  const PasswordRequirement = ({ met, label }: { met: boolean; label: string }) => (
+    <div className="flex items-center gap-2.5 text-xs">
+      <div className={`rounded-full p-0.5 transition-colors ${met ? 'bg-emerald-500/20' : 'bg-muted'}`}>
+        {met ? (
+          <Check className="h-3 w-3 text-emerald-500" />
+        ) : (
+          <X className="h-3 w-3 text-muted-foreground/50" />
+        )}
+      </div>
+      <span className={met ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-muted-foreground'}>
+        {label}
+      </span>
+    </div>
+  );
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -275,10 +297,21 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   </div>
                 </div>
 
+                {/* Password Requirements */}
+                {activeTab === 'signup' && password && (
+                  <div className="bg-muted/40 rounded-xl p-4 space-y-2.5 border border-border/50">
+                    <p className="text-xs font-bold text-muted-foreground mb-1">Password Requirements:</p>
+                    <PasswordRequirement met={hasLowercase} label="Lowercase letters (a-z)" />
+                    <PasswordRequirement met={hasUppercase} label="Uppercase letters (A-Z)" />
+                    <PasswordRequirement met={hasNumbers} label="Numbers (0-9)" />
+                    <PasswordRequirement met={hasSpecialChars} label="Special characters (! @ # $ % ^ & *)" />
+                  </div>
+                )}
+
                 <Button 
                   type="submit" 
-                  disabled={loading} 
-                  className="w-full h-12 text-xs font-bold rounded-xl mt-3 bg-gradient-to-r from-primary to-violet-600 hover:from-primary/95 hover:to-violet-600/95 text-white shadow-[0_6px_20px_rgba(var(--primary-rgb),0.25)] hover:shadow-[0_6px_25px_rgba(var(--primary-rgb),0.35)] transform hover:-translate-y-0.5 transition-all duration-300"
+                  disabled={loading || (activeTab === 'signup' && !allRequirementsMet)} 
+                  className="w-full h-12 text-xs font-bold rounded-xl mt-3 bg-gradient-to-r from-primary to-violet-600 hover:from-primary/95 hover:to-violet-600/95 text-white shadow-[0_6px_20px_rgba(var(--primary-rgb),0.25)] hover:shadow-[0_6px_25px_rgba(var(--primary-rgb),0.35)] transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>
