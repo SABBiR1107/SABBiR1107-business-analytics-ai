@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
 import { Send, Loader2, Bot, User, AlertCircle, Sparkles, Terminal, Copy, Check, FileSpreadsheet, MessageSquare } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
@@ -341,11 +340,6 @@ export function ChatInterface({ dataset }: ChatInterfaceProps) {
             )}
           </div>
         </div>
-
-        <Badge variant="outline" className="text-[10px] font-bold py-1 px-2.5 rounded-lg bg-background/50 border-primary/15 text-foreground flex items-center gap-1">
-          <FileSpreadsheet className="h-3.5 w-3.5 shrink-0" />
-          {dataset?.filename || 'spreadsheet.csv'}
-        </Badge>
       </CardHeader>
       
       <CardContent className="flex-1 flex flex-col gap-0 p-0 overflow-hidden relative">
