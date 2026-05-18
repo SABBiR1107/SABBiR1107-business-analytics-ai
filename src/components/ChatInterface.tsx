@@ -504,12 +504,7 @@ export function ChatInterface({ dataset }: ChatInterfaceProps) {
               <div className="pl-3 pr-1.5 flex items-center shrink-0">
                 <MessageSquare className="h-4.5 w-4.5 text-muted-foreground/60" />
               </div>
-              <div className="pl-1.5 pr-2.5 py-1.5 text-muted-foreground flex items-center gap-1.5 border-r border-border/40 mr-3 shrink-0 bg-secondary/50 rounded-xl select-none">
-                <FileSpreadsheet className="h-4 w-4 text-primary" />
-                <span className="text-[10px] font-extrabold truncate max-w-[85px] uppercase tracking-wider text-foreground/80">
-                  {dataset?.filename ? dataset.filename.split('.').slice(0, -1).join('.') : 'Spreadsheet'}
-                </span>
-              </div>
+
               
               <input
                 value={input}
