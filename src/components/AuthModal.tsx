@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Loader2, Mail, Lock, Shield, Sparkles } from 'lucide-react';
+import { Loader2, Mail, Lock, Shield, Sparkles, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -16,10 +17,13 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showSignupConfirm, setShowSignupConfirm] = useState(false);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +43,8 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
       toast.success('Successfully logged in!');
       onClose();
       resetForm();
+      // Redirect to dashboard after successful login
+      router.push('/dashboard');
     } catch (err: any) {
       toast.error(err.message || 'Failed to sign in');
     } finally {
@@ -64,8 +70,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
       });
 
       if (error) throw error;
-      toast.success('Registration successful! You can now log in.');
-      setActiveTab('login');
+      
+      // Show confirmation popup
+      setShowSignupConfirm(true);
+      setTimeout(() => {
+        setShowSignupConfirm(false);
+        setActiveTab('login');
+        resetForm();
+      }, 3000);
     } catch (err: any) {
       toast.error(err.message || 'Failed to sign up');
     } finally {
@@ -123,13 +135,12 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             <div className="mx-auto relative group mb-1">
               <div className="absolute -inset-1.5 bg-gradient-to-r from-primary via-violet-500 to-amber-500 rounded-2xl blur-[12px] opacity-75 group-hover:opacity-100 group-hover:blur-[15px] transition duration-500 animate-pulse" />
               <div className="relative bg-card dark:bg-zinc-900 p-2.5 rounded-2xl shadow-xl border border-border/80 flex items-center justify-center h-14 w-14 group-hover:scale-105 transition-transform duration-500">
-                <img src="/logo.png" alt="Business Analytics Logo" className="h-8.5 w-8.5 object-contain select-none animate-bounce" style={{ animationDuration: '4s' }} />
+                <img src="/logo.png" alt="Business Analytics Logo" className="h-8.5 w-8.5 object-contain select-none" />
               </div>
             </div>
             
-            <DialogTitle className="text-2xl font-black text-center tracking-tight flex items-center justify-center gap-2">
+            <DialogTitle className="text-2xl font-black text-center tracking-tight whitespace-nowrap">
               Welcome to <span className="bg-gradient-to-r from-primary to-amber-500 bg-clip-text text-transparent font-extrabold">Business Analytics</span>
-              <Sparkles className="h-4 w-4 text-primary animate-spin" style={{ animationDuration: '4s' }} />
             </DialogTitle>
             <DialogDescription className="text-center text-muted-foreground text-[11px] leading-relaxed max-w-[280px] mx-auto">
               Secure cloud authentication & lightning-fast visual spreadsheet analytics
@@ -180,13 +191,24 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     <Lock className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-muted-foreground/75" />
                     <Input
                       id="password-login"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="pl-11 h-11 rounded-xl border-input/60 hover:border-primary/50 focus-visible:ring-primary/20 focus-visible:border-primary/80 font-medium text-xs shadow-sm bg-background/50"
+                      className="pl-11 pr-11 h-11 rounded-xl border-input/60 hover:border-primary/50 focus-visible:ring-primary/20 focus-visible:border-primary/80 font-medium text-xs shadow-sm bg-background/50"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3.5 top-3.5 text-muted-foreground/75 hover:text-primary transition-colors"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4.5 w-4.5" />
+                      ) : (
+                        <Eye className="h-4.5 w-4.5" />
+                      )}
+                    </button>
                   </div>
                 </div>
 
@@ -232,13 +254,24 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     <Lock className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-muted-foreground/75" />
                     <Input
                       id="password-signup"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="pl-11 h-11 rounded-xl border-input/60 hover:border-primary/50 focus-visible:ring-primary/20 focus-visible:border-primary/80 font-medium text-xs shadow-sm bg-background/50"
+                      className="pl-11 pr-11 h-11 rounded-xl border-input/60 hover:border-primary/50 focus-visible:ring-primary/20 focus-visible:border-primary/80 font-medium text-xs shadow-sm bg-background/50"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3.5 top-3.5 text-muted-foreground/75 hover:text-primary transition-colors"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4.5 w-4.5" />
+                      ) : (
+                        <Eye className="h-4.5 w-4.5" />
+                      )}
+                    </button>
                   </div>
                 </div>
 
@@ -285,6 +318,31 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </svg>
             Continue with Google Gmail
           </Button>
+
+          {/* Signup Confirmation Popup */}
+          {showSignupConfirm && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+              <div className="bg-background/95 dark:bg-zinc-900/95 border border-primary/30 rounded-3xl p-8 shadow-2xl animate-in fade-in scale-in duration-300 max-w-sm mx-4">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="relative">
+                    <div className="absolute -inset-2 bg-gradient-to-r from-primary via-violet-500 to-emerald-400 rounded-full blur-xl opacity-75 animate-pulse" />
+                    <div className="relative bg-primary/10 p-4 rounded-full">
+                      <CheckCircle2 className="h-8 w-8 text-primary animate-bounce" />
+                    </div>
+                  </div>
+                  <div className="text-center space-y-2">
+                    <h3 className="text-lg font-bold text-white">Confirmation Email Sent!</h3>
+                    <p className="text-sm text-muted-foreground">
+                      We've sent a confirmation email to <span className="font-semibold text-primary">{email}</span>. Please verify your email to activate your account.
+                    </p>
+                  </div>
+                  <p className="text-xs text-muted-foreground text-center">
+                    Redirecting to login in a moment...
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
