@@ -342,7 +342,7 @@ export function ChatInterface({ dataset }: ChatInterfaceProps) {
           </div>
         </div>
 
-        <Badge variant="outline" className="text-[10px] font-bold py-1 px-2.5 rounded-lg bg-background/50 border-primary/15 text-primary flex items-center gap-1">
+        <Badge variant="outline" className="text-[10px] font-bold py-1 px-2.5 rounded-lg bg-background/50 border-primary/15 text-foreground flex items-center gap-1">
           <FileSpreadsheet className="h-3.5 w-3.5 shrink-0" />
           {dataset?.filename || 'spreadsheet.csv'}
         </Badge>
