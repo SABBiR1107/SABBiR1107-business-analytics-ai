@@ -18,6 +18,7 @@ import { SemanticGlossary } from '@/components/SemanticGlossary';
 import { EmbedWidgetGenerator } from '@/components/EmbedWidgetGenerator';
 import { CohortHeatmap } from '@/components/CohortHeatmap';
 import { PythonSandbox } from '@/components/PythonSandbox';
+import { IntegrationsManager } from '@/components/IntegrationsManager';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -178,6 +179,14 @@ export default function DashboardPage() {
     }, 500);
   };
 
+  const handleIntegrationsSynced = (dataset: { data: any[]; columns: string[] }, filename: string) => {
+    handleDataUploaded({
+      data: dataset.data,
+      columns: dataset.columns,
+      filename: filename
+    }, filename);
+  };
+
   const handleLoadHistoryDataset = (dataset: SavedDataset) => {
     setIsLoading(true);
     setTemplateOverride(null);
@@ -259,6 +268,14 @@ export default function DashboardPage() {
               </div>
 
               <FileUpload onDataUploaded={(data) => handleDataUploaded(data)} />
+
+              <div className="relative flex py-2 items-center">
+                <div className="flex-grow border-t border-border/40"></div>
+                <span className="flex-shrink mx-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Or Connect Live Database</span>
+                <div className="flex-grow border-t border-border/40"></div>
+              </div>
+
+              <IntegrationsManager onDataSynced={handleIntegrationsSynced} />
 
               {/* Feature Highlights */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
