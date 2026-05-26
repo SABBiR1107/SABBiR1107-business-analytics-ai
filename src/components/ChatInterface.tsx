@@ -136,7 +136,12 @@ export function ChatInterface({ dataset, semanticRules = [] }: ChatInterfaceProp
 
         if (language === 'json-chart') {
           try {
-            const chartData = JSON.parse(codeBody);
+            // Clean comments and trailing commas to guarantee robust parsing across models
+            let cleanedBody = codeBody.trim();
+            cleanedBody = cleanedBody.replace(/\/\/.*/g, ''); // strip single-line comments
+            cleanedBody = cleanedBody.replace(/,(\s*[\]}])/g, '$1'); // strip trailing commas
+            
+            const chartData = JSON.parse(cleanedBody);
             const type = chartData.type || 'line';
             const title = chartData.title || 'Live Visualization';
             const xAxisKey = chartData.xAxisKey || 'name';
