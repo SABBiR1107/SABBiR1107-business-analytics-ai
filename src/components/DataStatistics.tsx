@@ -27,13 +27,15 @@ export function DataStatistics({ data, columns }: DataStatisticsProps) {
     const max = Math.max(...values);
     const min = Math.min(...values);
     
+    const changeVal = values[0] === 0 ? 0 : ((values[values.length - 1] - values[0]) / values[0] * 100);
+    
     return {
       column: col,
       total,
       average,
       max,
       min,
-      change: ((values[values.length - 1] - values[0]) / values[0] * 100) || 0
+      change: isNaN(changeVal) || !isFinite(changeVal) ? 0 : changeVal
     };
   });
 
