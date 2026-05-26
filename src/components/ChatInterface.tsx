@@ -10,11 +10,17 @@ import { Send, Loader2, Bot, User, AlertCircle, Sparkles, Terminal, Copy, Check,
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 
-interface ChatInterfaceProps {
-  dataset: any;
+interface SemanticRule {
+  name: string;
+  formula: string;
 }
 
-export function ChatInterface({ dataset }: ChatInterfaceProps) {
+interface ChatInterfaceProps {
+  dataset: any;
+  semanticRules?: SemanticRule[];
+}
+
+export function ChatInterface({ dataset, semanticRules = [] }: ChatInterfaceProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [apiError, setApiError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -32,7 +38,7 @@ export function ChatInterface({ dataset }: ChatInterfaceProps) {
 
   const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
     api: '/api/chat',
-    body: { dataset, model: selectedModel.apiName },
+    body: { dataset, model: selectedModel.apiName, semanticRules },
     onError: (err) => {
       console.error('Chat error:', err);
       setApiError(err.message || 'Failed to get response from AI');

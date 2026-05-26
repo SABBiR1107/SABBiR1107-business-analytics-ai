@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -44,6 +44,7 @@ import {
 interface DataChartsProps {
   data: any[];
   columns: string[];
+  templateOverride?: { xAxis: string; yAxis: string; chartType?: string } | null;
 }
 
 // Tailored Premium Color Palette (Vibrant SaaS Colors)
@@ -58,7 +59,7 @@ const COLORS = [
   '#f43f5e'  // Rose
 ];
 
-export function DataCharts({ data, columns }: DataChartsProps) {
+export function DataCharts({ data, columns, templateOverride }: DataChartsProps) {
   // Find numeric and text columns
   const numericColumns = columns.filter(col => {
     // Find the first non-empty value to determine types reliably
@@ -90,6 +91,28 @@ export function DataCharts({ data, columns }: DataChartsProps) {
 
   const [scatterXAxis, setScatterXAxis] = useState(numericColumns[0] || columns[0] || '');
   const [scatterYAxis, setScatterYAxis] = useState(numericColumns[1] || numericColumns[0] || columns[1] || '');
+
+  // Synchronize dynamic dashboard template configuration
+  useEffect(() => {
+    if (templateOverride) {
+      const { xAxis, yAxis, chartType } = templateOverride;
+      if (xAxis && yAxis) {
+        if (chartType === 'line') {
+          setLineXAxis(xAxis);
+          setLineYAxis(yAxis);
+        } else if (chartType === 'bar') {
+          setBarXAxis(xAxis);
+          setBarYAxis(yAxis);
+        } else if (chartType === 'area') {
+          setAreaXAxis(xAxis);
+          setAreaYAxis(yAxis);
+        } else if (chartType === 'radar') {
+          setRadarCategory(xAxis);
+          setRadarValue(yAxis);
+        }
+      }
+    }
+  }, [templateOverride]);
 
   // 1. Prepare Line Chart Data
   const lineChartData = data.slice(0, 50).map((row, index) => {

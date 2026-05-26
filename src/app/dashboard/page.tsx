@@ -12,6 +12,12 @@ import { ExportData } from '@/components/ExportData';
 import { DataLoadingSkeleton } from '@/components/DataLoadingSkeleton';
 import { Navbar } from '@/components/Navbar';
 import { KeyboardShortcuts } from '@/components/KeyboardShortcuts';
+import { DataSanitizer } from '@/components/DataSanitizer';
+import { AutoTemplates } from '@/components/AutoTemplates';
+import { SemanticGlossary } from '@/components/SemanticGlossary';
+import { EmbedWidgetGenerator } from '@/components/EmbedWidgetGenerator';
+import { CohortHeatmap } from '@/components/CohortHeatmap';
+import { PythonSandbox } from '@/components/PythonSandbox';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -38,6 +44,17 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [historyDatasets, setHistoryDatasets] = useState<SavedDataset[]>([]);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+  
+  const [templateOverride, setTemplateOverride] = useState<{ xAxis: string; yAxis: string; chartType?: string } | null>(null);
+  const [semanticRules, setSemanticRules] = useState<{ name: string; formula: string }[]>([]);
+
+  const handleAddSemanticRule = (rule: { name: string; formula: string }) => {
+    setSemanticRules(prev => [...prev, rule]);
+  };
+
+  const handleRemoveSemanticRule = (index: number) => {
+    setSemanticRules(prev => prev.filter((_, i) => i !== index));
+  };
   
   const exportButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -149,6 +166,7 @@ export default function DashboardPage() {
 
     // Simulate short processing time for UX feel
     setTimeout(() => {
+      setTemplateOverride(null);
       setUploadedData({
         data: data.data,
         columns: data.columns,
@@ -162,6 +180,7 @@ export default function DashboardPage() {
 
   const handleLoadHistoryDataset = (dataset: SavedDataset) => {
     setIsLoading(true);
+    setTemplateOverride(null);
     setTimeout(() => {
       setUploadedData({
         data: dataset.data,
@@ -191,7 +210,20 @@ export default function DashboardPage() {
 
   const handleReset = () => {
     setUploadedData(null);
+    setTemplateOverride(null);
+    setSemanticRules([]);
     toast.info('Ready to analyze a new file');
+  };
+
+  const handleDataSanitized = (cleanedRows: any[]) => {
+    setUploadedData((prev: any) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        data: cleanedRows,
+        rowCount: cleanedRows.length
+      };
+    });
   };
 
   const handleExport = () => {
@@ -366,6 +398,46 @@ export default function DashboardPage() {
               </div>
             </Card>
 
+            {/* AI SaaS Premium Features Suite - Row 1 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <DataSanitizer 
+                data={uploadedData.data} 
+                columns={uploadedData.columns} 
+                onDataSanitized={handleDataSanitized} 
+              />
+              <AutoTemplates 
+                data={uploadedData.data} 
+                columns={uploadedData.columns}
+                activeXAxis={templateOverride?.xAxis || ''}
+                activeYAxis={templateOverride?.yAxis || ''}
+                onApplyTemplate={(xAxis, yAxis, chartType) => setTemplateOverride({ xAxis, yAxis, chartType })}
+              />
+            </div>
+
+            {/* AI SaaS Premium Features Suite - Row 2 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <SemanticGlossary 
+                rules={semanticRules}
+                onAddRule={handleAddSemanticRule}
+                onRemoveRule={handleRemoveSemanticRule}
+              />
+              <EmbedWidgetGenerator 
+                filename={uploadedData.filename}
+                columns={uploadedData.columns}
+              />
+            </div>
+
+            {/* AI SaaS Premium Features Suite - Row 3 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <CohortHeatmap 
+                data={uploadedData.data}
+                columns={uploadedData.columns}
+              />
+              <PythonSandbox 
+                data={uploadedData.data}
+              />
+            </div>
+
             {/* Data Statistics Cards */}
             <DataStatistics 
               data={uploadedData.data} 
@@ -388,6 +460,7 @@ export default function DashboardPage() {
               <DataCharts 
                 data={uploadedData.data} 
                 columns={uploadedData.columns} 
+                templateOverride={templateOverride}
               />
             </div>
 
@@ -397,7 +470,7 @@ export default function DashboardPage() {
                 <Sparkles className="h-5.5 w-5.5 text-primary" />
                 Conversational AI Analysis
               </h2>
-              <ChatInterface dataset={uploadedData} />
+              <ChatInterface dataset={uploadedData} semanticRules={semanticRules} />
             </div>
           </div>
         ) : null}

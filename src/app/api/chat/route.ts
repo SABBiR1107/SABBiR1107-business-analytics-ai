@@ -5,7 +5,7 @@ export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages, dataset, model } = await request.json();
+    const { messages, dataset, model, semanticRules } = await request.json();
 
     if (!process.env.OPENROUTER_API_KEY) {
       return Response.json(
@@ -34,9 +34,15 @@ export async function POST(request: NextRequest) {
       
       const fullCsv = `${headers}\n${rows}`;
 
+      let rulesContext = '';
+      if (semanticRules && Array.isArray(semanticRules) && semanticRules.length > 0) {
+        rulesContext = `\nCRITICAL: The user has established strict Semantic Glossary Rules for business calculations. You MUST calculate these metrics using ONLY the formulas defined below:\n` +
+          semanticRules.map((rule: any) => `- **${rule.name}**: ${rule.formula}`).join('\n') + `\n`;
+      }
+
       systemPrompt = `You are an elite business analytics expert. You have full access to the user's uploaded spreadsheet dataset.
 You must perform exact calculations, aggregations, and data-driven analysis based on the complete dataset provided below.
-
+${rulesContext}
 Uploaded Dataset Details:
 - Filename: ${dataset.filename || 'business-data.csv'}
 - Total Row Count: ${dataset.rowCount} rows (Displaying first ${limitedData.length} rows for high-fidelity calculations)
