@@ -8,7 +8,21 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Send, Loader2, Bot, User, AlertCircle, Sparkles, Terminal, Copy, Check, FileSpreadsheet, MessageSquare } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import {
+  ResponsiveContainer,
+  LineChart as ReChartsLineChart,
+  Line as ReChartsLine,
+  BarChart as ReChartsBarChart,
+  Bar as ReChartsBar,
+  AreaChart as ReChartsAreaChart,
+  Area as ReChartsArea,
+  XAxis as ReChartsXAxis,
+  YAxis as ReChartsYAxis,
+  CartesianGrid as ReChartsCartesianGrid,
+  Tooltip as ReChartsTooltip
+} from 'recharts';
 
 interface SemanticRule {
   name: string;
@@ -118,6 +132,81 @@ export function ChatInterface({ dataset, semanticRules = [] }: ChatInterfaceProp
         if (lines.length > 0 && lines[0].length < 15 && !lines[0].includes(' ') && isNaN(Number(lines[0]))) {
           language = lines[0];
           codeBody = lines.slice(1).join('\n');
+        }
+
+        if (language === 'json-chart') {
+          try {
+            const chartData = JSON.parse(codeBody);
+            const type = chartData.type || 'line';
+            const title = chartData.title || 'Live Visualization';
+            const xAxisKey = chartData.xAxisKey || 'name';
+            const yAxisKey = chartData.yAxisKey || 'value';
+            const data = chartData.data || [];
+
+            return (
+              <div key={index} className="my-4 p-4 border border-primary/20 rounded-2xl bg-slate-950/80 shadow-xl backdrop-blur-md">
+                <div className="flex items-center justify-between mb-3 text-xs">
+                  <span className="font-extrabold text-foreground flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
+                    <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" />
+                    {title}
+                  </span>
+                  <Badge variant="outline" className="text-[8px] border-primary/20 text-primary font-black uppercase tracking-widest h-5">
+                    {type} chart
+                  </Badge>
+                </div>
+                
+                <div className="h-48 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    {type === 'bar' ? (
+                      <ReChartsBarChart data={data} margin={{ top: 5, right: 10, left: -25, bottom: 5 }}>
+                        <ReChartsCartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                        <ReChartsXAxis dataKey={xAxisKey} stroke="rgba(255,255,255,0.4)" fontSize={9} tickLine={false} />
+                        <ReChartsYAxis stroke="rgba(255,255,255,0.4)" fontSize={9} tickLine={false} />
+                        <ReChartsTooltip 
+                          contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: 'rgba(59, 130, 246, 0.2)', borderRadius: '12px' }}
+                          labelStyle={{ color: '#fff', fontWeight: 'bold', fontSize: '10px' }}
+                          itemStyle={{ fontSize: '10px' }}
+                        />
+                        <ReChartsBar dataKey={yAxisKey} fill="#3b82f6" radius={[4, 4, 0, 0]} opacity={0.85} />
+                      </ReChartsBarChart>
+                    ) : type === 'area' ? (
+                      <ReChartsAreaChart data={data} margin={{ top: 5, right: 10, left: -25, bottom: 5 }}>
+                        <defs>
+                          <linearGradient id={`grad-${index}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
+                            <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <ReChartsCartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                        <ReChartsXAxis dataKey={xAxisKey} stroke="rgba(255,255,255,0.4)" fontSize={9} tickLine={false} />
+                        <ReChartsYAxis stroke="rgba(255,255,255,0.4)" fontSize={9} tickLine={false} />
+                        <ReChartsTooltip 
+                          contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: 'rgba(16, 185, 129, 0.2)', borderRadius: '12px' }}
+                          labelStyle={{ color: '#fff', fontWeight: 'bold', fontSize: '10px' }}
+                          itemStyle={{ fontSize: '10px' }}
+                        />
+                        <ReChartsArea type="monotone" dataKey={yAxisKey} stroke="#10b981" strokeWidth={2} fillOpacity={1} fill={`url(#grad-${index})`} />
+                      </ReChartsAreaChart>
+                    ) : (
+                      <ReChartsLineChart data={data} margin={{ top: 5, right: 10, left: -25, bottom: 5 }}>
+                        <ReChartsCartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                        <ReChartsXAxis dataKey={xAxisKey} stroke="rgba(255,255,255,0.4)" fontSize={9} tickLine={false} />
+                        <ReChartsYAxis stroke="rgba(255,255,255,0.4)" fontSize={9} tickLine={false} />
+                        <ReChartsTooltip 
+                          contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: 'rgba(59, 130, 246, 0.2)', borderRadius: '12px' }}
+                          labelStyle={{ color: '#fff', fontWeight: 'bold', fontSize: '10px' }}
+                          itemStyle={{ fontSize: '10px' }}
+                        />
+                        <ReChartsLine type="monotone" dataKey={yAxisKey} stroke="#3b82f6" strokeWidth={2.5} dot={{ r: 2 }} activeDot={{ r: 4 }} />
+                      </ReChartsLineChart>
+                    )}
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            );
+          } catch (e) {
+            console.error('Failed to parse inline json-chart:', e);
+          }
         }
 
         const blockId = `${msgId}-code-${index}`;
