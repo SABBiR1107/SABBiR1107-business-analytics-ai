@@ -106,8 +106,9 @@ export function ChatInterface({ dataset, semanticRules = [] }: ChatInterfaceProp
   };
 
   // Safe helper parser for inline bold and badge highlighted text
-  const parseInlineBold = (text: string) => {
-    const boldParts = text.split(/(\*\*.*?\*\*)/g);
+  const parseInlineBold = (text: string | undefined | null) => {
+    const safeText = text || '';
+    const boldParts = safeText.split(/(\*\*.*?\*\*)/g);
     return boldParts.map((bPart, bIdx) => {
       if (bPart.startsWith('**') && bPart.endsWith('**')) {
         return <strong key={bIdx} className="font-extrabold text-foreground bg-primary/5 px-1.5 py-0.5 rounded border border-primary/5">{bPart.slice(2, -2)}</strong>;
@@ -119,8 +120,9 @@ export function ChatInterface({ dataset, semanticRules = [] }: ChatInterfaceProp
   /**
    * Premium custom Markdown report parser for gorgeous, highly structured report outputs.
    */
-  const renderMessageContent = (content: string, msgId: string) => {
-    const parts = content.split(/(```[\s\S]*?```)/g);
+  const renderMessageContent = (content: string | undefined | null, msgId: string) => {
+    const safeContent = content || '';
+    const parts = safeContent.split(/(```[\s\S]*?```)/g);
 
     return parts.map((part, index) => {
       if (part.startsWith('```') && part.endsWith('```')) {
@@ -142,11 +144,15 @@ export function ChatInterface({ dataset, semanticRules = [] }: ChatInterfaceProp
             cleanedBody = cleanedBody.replace(/,(\s*[\]}])/g, '$1'); // strip trailing commas
             
             const chartData = JSON.parse(cleanedBody);
+            if (!chartData || typeof chartData !== 'object') {
+              throw new Error('Parsed JSON chart data is not an object');
+            }
             const type = chartData.type || 'line';
             const title = chartData.title || 'Live Visualization';
             const xAxisKey = chartData.xAxisKey || 'name';
             const yAxisKey = chartData.yAxisKey || 'value';
-            const data = chartData.data || [];
+            const rawData = Array.isArray(chartData.data) ? chartData.data : [];
+            const data = rawData.filter((item: any) => item && typeof item === 'object');
 
             return (
               <div key={index} className="my-4 p-4 border border-primary/20 rounded-2xl bg-slate-950/80 shadow-xl backdrop-blur-md">
@@ -248,10 +254,10 @@ export function ChatInterface({ dataset, semanticRules = [] }: ChatInterfaceProp
       let isInsideTable = false;
 
       const renderTable = (rows: string[][], tableIdx: number) => {
-        if (rows.length === 0) return null;
+        if (!rows || rows.length === 0) return null;
         
         // The first row is the header row
-        const headers = rows[0];
+        const headers = rows[0] || [];
         const bodyRows = rows.slice(1);
 
         return (
@@ -261,24 +267,27 @@ export function ChatInterface({ dataset, semanticRules = [] }: ChatInterfaceProp
                 <tr className="bg-primary/10 border-b border-border/30">
                   {headers.map((cell, cellIdx) => (
                     <th key={cellIdx} className="px-4 py-3 font-extrabold text-foreground tracking-tight whitespace-nowrap">
-                      {parseInlineBold(cell.trim())}
+                      {parseInlineBold(cell ? cell.trim() : '')}
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/20">
-                {bodyRows.map((row, rowIdx) => (
-                  <tr 
-                    key={rowIdx} 
-                    className="hover:bg-primary/5 transition-colors odd:bg-secondary/15 even:bg-transparent"
-                  >
-                    {row.map((cell, cellIdx) => (
-                      <td key={cellIdx} className="px-4 py-2.5 font-medium text-foreground/90 whitespace-normal">
-                        {parseInlineBold(cell.trim())}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
+                {bodyRows.map((row, rowIdx) => {
+                  if (!Array.isArray(row)) return null;
+                  return (
+                    <tr 
+                      key={rowIdx} 
+                      className="hover:bg-primary/5 transition-colors odd:bg-secondary/15 even:bg-transparent"
+                    >
+                      {row.map((cell, cellIdx) => (
+                        <td key={cellIdx} className="px-4 py-2.5 font-medium text-foreground/90 whitespace-normal">
+                          {parseInlineBold(cell ? cell.trim() : '')}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -490,7 +499,8 @@ export function ChatInterface({ dataset, semanticRules = [] }: ChatInterfaceProp
               /* ChatGPT Chat Thread */
               <div className="space-y-6">
                 {messages.map((message) => {
-                  const [mainContent, suggestionsPart] = message.content.split('[SUGGESTED_QUESTIONS]');
+                  const content = message.content || '';
+                  const [mainContent, suggestionsPart] = content.split('[SUGGESTED_QUESTIONS]');
                   
                   let parsedSuggestions: string[] = [];
                   if (suggestionsPart) {
