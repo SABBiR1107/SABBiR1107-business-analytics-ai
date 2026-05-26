@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { AuthModal } from '@/components/AuthModal';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   BarChart3,
   FileSpreadsheet,
@@ -34,7 +35,10 @@ import {
   CloudLightning,
   AlertCircle,
   Lock,
-  Loader2
+  Loader2,
+  MessageSquare,
+  Terminal,
+  ShieldAlert
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -415,80 +419,106 @@ export default function DashboardPage() {
               </div>
             </Card>
 
-            {/* AI SaaS Premium Features Suite - Row 1 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <DataSanitizer 
-                data={uploadedData.data} 
-                columns={uploadedData.columns} 
-                onDataSanitized={handleDataSanitized} 
-              />
-              <AutoTemplates 
-                data={uploadedData.data} 
-                columns={uploadedData.columns}
-                activeXAxis={templateOverride?.xAxis || ''}
-                activeYAxis={templateOverride?.yAxis || ''}
-                onApplyTemplate={(xAxis, yAxis, chartType) => setTemplateOverride({ xAxis, yAxis, chartType })}
-              />
-            </div>
+            {/* SaaS Responsive Glassmorphic Workspace Control Panel */}
+            <Tabs defaultValue="analytics" className="w-full space-y-6">
+              <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-2 bg-muted/40 p-1.5 rounded-2xl border border-border/40 h-auto">
+                <TabsTrigger value="analytics" className="rounded-xl font-bold py-2.5 text-xs flex items-center gap-1.5 transition-all">
+                  <BarChart3 className="h-4 w-4" />
+                  Analytics Studio
+                </TabsTrigger>
+                <TabsTrigger value="studio" className="rounded-xl font-bold py-2.5 text-xs flex items-center gap-1.5 transition-all">
+                  <Sparkles className="h-4 w-4" />
+                  Data Sanitizer
+                </TabsTrigger>
+                <TabsTrigger value="rules" className="rounded-xl font-bold py-2.5 text-xs flex items-center gap-1.5 transition-all">
+                  <ShieldAlert className="h-4 w-4" />
+                  AI Rule Book
+                </TabsTrigger>
+                <TabsTrigger value="science" className="rounded-xl font-bold py-2.5 text-xs flex items-center gap-1.5 transition-all">
+                  <Terminal className="h-4 w-4" />
+                  Data Science Lab
+                </TabsTrigger>
+                <TabsTrigger value="chat" className="rounded-xl font-bold py-2.5 text-xs flex items-center gap-1.5 transition-all col-span-2 md:col-span-1">
+                  <MessageSquare className="h-4 w-4" />
+                  AI Agent Chat
+                </TabsTrigger>
+              </TabsList>
 
-            {/* AI SaaS Premium Features Suite - Row 2 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <SemanticGlossary 
-                rules={semanticRules}
-                onAddRule={handleAddSemanticRule}
-                onRemoveRule={handleRemoveSemanticRule}
-              />
-              <EmbedWidgetGenerator 
-                filename={uploadedData.filename}
-                columns={uploadedData.columns}
-              />
-            </div>
+              {/* Tab Content 1: Primary Visual Analytics */}
+              <TabsContent value="analytics" className="space-y-6 focus:outline-none">
+                <DataStatistics 
+                  data={uploadedData.data} 
+                  columns={uploadedData.columns} 
+                />
+                <EnhancedDataTable 
+                  data={uploadedData.data}
+                  columns={uploadedData.columns}
+                  rowCount={uploadedData.rowCount}
+                />
+                <div className="border-t border-border/20 pt-6">
+                  <h2 className="text-xl md:text-2xl font-black mb-4 flex items-center gap-2 tracking-tight">
+                    <BarChart3 className="h-5.5 w-5.5 text-primary animate-pulse" />
+                    Premium Visual Analytics
+                  </h2>
+                  <DataCharts 
+                    data={uploadedData.data} 
+                    columns={uploadedData.columns} 
+                    templateOverride={templateOverride}
+                  />
+                </div>
+              </TabsContent>
 
-            {/* AI SaaS Premium Features Suite - Row 3 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <CohortHeatmap 
-                data={uploadedData.data}
-                columns={uploadedData.columns}
-              />
-              <PythonSandbox 
-                data={uploadedData.data}
-              />
-            </div>
+              {/* Tab Content 2: Data Sanitization & Templates */}
+              <TabsContent value="studio" className="grid grid-cols-1 lg:grid-cols-2 gap-6 focus:outline-none">
+                <DataSanitizer 
+                  data={uploadedData.data} 
+                  columns={uploadedData.columns} 
+                  onDataSanitized={handleDataSanitized} 
+                />
+                <AutoTemplates 
+                  data={uploadedData.data} 
+                  columns={uploadedData.columns}
+                  activeXAxis={templateOverride?.xAxis || ''}
+                  activeYAxis={templateOverride?.yAxis || ''}
+                  onApplyTemplate={(xAxis, yAxis, chartType) => setTemplateOverride({ xAxis, yAxis, chartType })}
+                />
+              </TabsContent>
 
-            {/* Data Statistics Cards */}
-            <DataStatistics 
-              data={uploadedData.data} 
-              columns={uploadedData.columns} 
-            />
+              {/* Tab Content 3: Custom AI Rules & Embed Scripts */}
+              <TabsContent value="rules" className="grid grid-cols-1 lg:grid-cols-2 gap-6 focus:outline-none">
+                <SemanticGlossary 
+                  rules={semanticRules}
+                  onAddRule={handleAddSemanticRule}
+                  onRemoveRule={handleRemoveSemanticRule}
+                />
+                <EmbedWidgetGenerator 
+                  filename={uploadedData.filename}
+                  columns={uploadedData.columns}
+                />
+              </TabsContent>
 
-            {/* Interactive Data Table Component */}
-            <EnhancedDataTable 
-              data={uploadedData.data}
-              columns={uploadedData.columns}
-              rowCount={uploadedData.rowCount}
-            />
+              {/* Tab Content 4: Cohort Retention & Python Sandbox */}
+              <TabsContent value="science" className="grid grid-cols-1 lg:grid-cols-2 gap-6 focus:outline-none">
+                <CohortHeatmap 
+                  data={uploadedData.data}
+                  columns={uploadedData.columns}
+                />
+                <PythonSandbox 
+                  data={uploadedData.data}
+                />
+              </TabsContent>
 
-            {/* Premium Multi-Chart Visual Analytics */}
-            <div>
-              <h2 className="text-xl md:text-2xl font-black mb-4 flex items-center gap-2 tracking-tight">
-                <BarChart3 className="h-5.5 w-5.5 text-primary animate-pulse" />
-                Premium Visual Analytics
-              </h2>
-              <DataCharts 
-                data={uploadedData.data} 
-                columns={uploadedData.columns} 
-                templateOverride={templateOverride}
-              />
-            </div>
-
-            {/* Conversational AI Chat Interface */}
-            <div className="border-t border-border/40 pt-8">
-              <h2 className="text-xl md:text-2xl font-black mb-4 flex items-center gap-2 tracking-tight">
-                <Sparkles className="h-5.5 w-5.5 text-primary" />
-                Conversational AI Analysis
-              </h2>
-              <ChatInterface dataset={uploadedData} semanticRules={semanticRules} />
-            </div>
+              {/* Tab Content 5: AI Conversational Chat */}
+              <TabsContent value="chat" className="focus:outline-none">
+                <div className="border border-primary/10 rounded-3xl p-6 bg-card/35 backdrop-blur-md shadow-lg">
+                  <h2 className="text-xl md:text-2xl font-black mb-4 flex items-center gap-2 tracking-tight">
+                    <Sparkles className="h-5.5 w-5.5 text-primary" />
+                    Conversational AI Analysis
+                  </h2>
+                  <ChatInterface dataset={uploadedData} semanticRules={semanticRules} />
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         ) : null}
       </main>
