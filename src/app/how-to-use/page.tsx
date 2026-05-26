@@ -15,61 +15,64 @@ import {
   ArrowRight,
   HelpCircle,
   CheckCircle2,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Database,
+  ShieldCheck,
+  Code
 } from 'lucide-react';
 
 export default function HowToUsePage() {
   const steps = [
     {
       id: 'upload',
-      title: '1. Upload Dataset',
-      icon: UploadCloud,
+      title: '1. Connect & Sync Data',
+      icon: Database,
       color: 'text-blue-500 bg-blue-500/10',
-      description: 'Easily drag and drop your spreadsheet data to get started.',
+      description: 'Upload spreadsheet files or connect directly to live cloud database servers.',
       details: [
-        'Supports CSV (.csv) and Excel (.xlsx) file formats.',
-        'Data is parsed instantly in-browser using secure high-performance workers.',
-        'Your uploaded files remain isolated and private inside your session.',
-        'Supports column headers to automatically identify data dimensions.'
+        'Supports CSV (.csv) and Excel (.xlsx) file uploads.',
+        'Integrate live data pipelines from WooCommerce, Shopify, PostgreSQL, or MySQL.',
+        'SSL secure connection badges protect live API keys and credentials.',
+        'Synchronize data dynamically with mock generation scripts if database access keys are omitted.'
       ]
     },
     {
-      id: 'visualize',
-      title: '2. Dynamic Charts',
-      icon: LineChart,
+      id: 'sanitize',
+      title: '2. Clean & Define Rules',
+      icon: ShieldCheck,
       color: 'text-violet-500 bg-violet-500/10',
-      description: 'Uncover immediate patterns with auto-generated charts.',
+      description: 'Sanitize datasets of PII leakage and define strict glossary business rules.',
       details: [
-        'Choose from dynamic Line, Bar, Pie, Area, Radar, and Scatter charts.',
-        'Select variables for the X-Axis and Y-Axis from dropdown controllers.',
-        'Set custom aggregate values to sum values by text dimensions.',
-        'Charts are fully responsive and styled with professional harmonized color palettes.'
+        'Sanitize datasets: instantly drop duplicate entries and null rows.',
+        'Strip sensitive PII (emails, names, keys) in-browser before sharing.',
+        'Define strict Semantic Rules & Formula Books (e.g. customized calculations for margins or retention metrics).',
+        'Your defined rule books are strictly used by the AI Agent for calculation accuracy.'
+      ]
+    },
+    {
+      id: 'sandbox',
+      title: '3. Data Science Lab',
+      icon: Code,
+      color: 'text-amber-500 bg-amber-500/10',
+      description: 'Execute local Python script algorithms directly on your spreadsheet.',
+      details: [
+        'Run local scripts in-browser using a secure client-side Pyodide WASM sandbox.',
+        'No external execution server needed - fast, secure, and offline capable.',
+        'Utilize Python libraries to generate automated mathematical models.',
+        'Inspect raw console outputs and variable declarations interactively.'
       ]
     },
     {
       id: 'ai-chat',
-      title: '3. AI Assistant',
+      title: '4. AI Chat & Visuals',
       icon: MessageSquareCode,
       color: 'text-emerald-500 bg-emerald-500/10',
-      description: 'Interact directly with your spreadsheet using conversational AI.',
+      description: 'Interact with datasets and get automatic inline visualization graphs.',
       details: [
-        'Ask questions like: "What was our highest selling item last quarter?"',
-        'Request custom 1-Day, 1-Week, 15-Day, or monthly business reports.',
-        'Identify correlations, outliers, or growth predictions automatically.',
-        'No SQL knowledge required—the AI processes natural language queries instantly.'
-      ]
-    },
-    {
-      id: 'export',
-      title: '4. Download Reports',
-      icon: FileDown,
-      color: 'text-amber-500 bg-amber-500/10',
-      description: 'Keep your team aligned by exporting your processed datasets.',
-      details: [
-        'Download filtered search tables back as formatted CSVs.',
-        'Export dynamic visualizations directly into reports.',
-        'Save AI-generated report logs for sharing and future reference.',
-        'Save active sessions in Supabase to restore past data at any time.'
+        'Ask questions in plain language to generate business analysis reports.',
+        'AIs automatically generate inline Line, Bar, and Area charts inside chat bubbles.',
+        'Explicitly request particular styles ("show a line chart") and get exact visualizations.',
+        'Get suggestions for 3 deep follow-up questions at the end of each AI message.'
       ]
     }
   ];
