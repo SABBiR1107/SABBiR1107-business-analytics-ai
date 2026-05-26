@@ -87,7 +87,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: 'https://business-analytics-ai.vercel.app/dashboard',
         }
       });
 
@@ -119,7 +119,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo: 'https://business-analytics-ai.vercel.app/dashboard',
         }
       });
       if (error) throw error;
