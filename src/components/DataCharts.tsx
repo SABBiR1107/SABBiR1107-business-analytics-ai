@@ -61,14 +61,15 @@ const COLORS = [
 export function DataCharts({ data, columns }: DataChartsProps) {
   // Find numeric and text columns
   const numericColumns = columns.filter(col => {
-    const firstValue = data[0]?.[col];
-    return typeof firstValue === 'number' || !isNaN(Number(firstValue));
+    // Find the first non-empty value to determine types reliably
+    const nonNullRow = data.find(row => row[col] !== null && row[col] !== undefined && String(row[col]).trim() !== '');
+    if (!nonNullRow) return false;
+    const firstValue = nonNullRow[col];
+    if (typeof firstValue === 'boolean') return false;
+    return typeof firstValue === 'number' || (typeof firstValue === 'string' && !isNaN(Number(firstValue)));
   });
 
-  const textColumns = columns.filter(col => {
-    const firstValue = data[0]?.[col];
-    return typeof firstValue === 'string' && isNaN(Number(firstValue));
-  });
+  const textColumns = columns.filter(col => !numericColumns.includes(col));
 
   // State for chart-specific axes
   const [lineXAxis, setLineXAxis] = useState(columns[0] || '');

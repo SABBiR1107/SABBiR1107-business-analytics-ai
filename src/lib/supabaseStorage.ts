@@ -22,9 +22,25 @@ function getLocalDatasets(): SavedDataset[] {
 
 function saveLocalDataset(dataset: SavedDataset) {
   if (typeof window === 'undefined') return;
-  const datasets = getLocalDatasets();
-  datasets.push(dataset);
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(datasets));
+  try {
+    const datasets = getLocalDatasets();
+    datasets.push(dataset);
+    
+    // Keep only the last 5 local datasets to avoid QuotaExceededError
+    if (datasets.length > 5) {
+      datasets.shift();
+    }
+    
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(datasets));
+  } catch (error) {
+    console.error("Local storage quota exceeded:", error);
+    // Fallback: clear older local datasets and keep only the newest one
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify([dataset]));
+    } catch (fallbackError) {
+      console.error("Failed to save even a single dataset to local storage:", fallbackError);
+    }
+  }
 }
 
 function deleteLocalDataset(id: string) {

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Upload, FileSpreadsheet, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface FileUploadProps {
   onDataUploaded: (data: any) => void;
@@ -23,7 +24,7 @@ export function FileUpload({ onDataUploaded }: FileUploadProps) {
     ];
 
     if (!validTypes.includes(file.type) && !file.name.match(/\.(csv|xlsx|xls)$/i)) {
-      alert('Please upload a CSV or Excel file');
+      toast.error('Please upload a CSV or Excel file');
       return;
     }
 
@@ -47,7 +48,7 @@ export function FileUpload({ onDataUploaded }: FileUploadProps) {
       onDataUploaded(result);
     } catch (error) {
       console.error('Upload error:', error);
-      alert(error instanceof Error ? error.message : 'Failed to upload file');
+      toast.error(error instanceof Error ? error.message : 'Failed to upload file');
     } finally {
       setUploading(false);
     }
