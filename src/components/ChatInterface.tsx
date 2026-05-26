@@ -154,61 +154,67 @@ export function ChatInterface({ dataset, semanticRules = [] }: ChatInterfaceProp
             const rawData = Array.isArray(chartData.data) ? chartData.data : [];
             const data = rawData.filter((item: any) => item && typeof item === 'object');
 
-            return (
-              <div key={index} className="my-4 p-4 border border-primary/20 rounded-2xl bg-slate-950/80 shadow-xl backdrop-blur-md">
-                <div className="flex items-center justify-between mb-3 text-xs">
+             return (
+              <div key={index} className="my-4 p-5 border border-primary/15 rounded-2xl bg-slate-950/80 shadow-2xl backdrop-blur-md">
+                <div className="flex items-center justify-between mb-3.5 text-xs">
                   <span className="font-extrabold text-foreground flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
                     <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" />
                     {title}
                   </span>
-                  <Badge variant="outline" className="text-[8px] border-primary/20 text-primary font-black uppercase tracking-widest h-5">
+                  <Badge variant="outline" className="text-[8px] border-primary/20 text-primary font-black uppercase tracking-widest h-5 bg-primary/5 px-2">
                     {type} chart
                   </Badge>
                 </div>
                 
-                <div className="h-48 w-full">
+                <div className="h-64 w-full mt-2">
                   <ResponsiveContainer width="100%" height="100%">
                     {type === 'bar' ? (
-                      <ReChartsBarChart data={data} margin={{ top: 5, right: 10, left: -25, bottom: 5 }}>
-                        <ReChartsCartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                        <ReChartsXAxis dataKey={xAxisKey} stroke="rgba(255,255,255,0.4)" fontSize={9} tickLine={false} />
-                        <ReChartsYAxis stroke="rgba(255,255,255,0.4)" fontSize={9} tickLine={false} />
-                        <ReChartsTooltip 
-                          contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: 'rgba(59, 130, 246, 0.2)', borderRadius: '12px' }}
-                          labelStyle={{ color: '#fff', fontWeight: 'bold', fontSize: '10px' }}
-                          itemStyle={{ fontSize: '10px' }}
-                        />
-                        <ReChartsBar dataKey={yAxisKey} fill="#3b82f6" radius={[4, 4, 0, 0]} opacity={0.85} />
-                      </ReChartsBarChart>
-                    ) : type === 'area' ? (
-                      <ReChartsAreaChart data={data} margin={{ top: 5, right: 10, left: -25, bottom: 5 }}>
+                      <ReChartsBarChart data={data} margin={{ top: 15, right: 15, left: 5, bottom: 20 }}>
                         <defs>
-                          <linearGradient id={`grad-${index}`} x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
-                            <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                          <linearGradient id={`bar-grad-${index}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#6366f1" stopOpacity={0.95}/>
+                            <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.35}/>
                           </linearGradient>
                         </defs>
-                        <ReChartsCartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                        <ReChartsXAxis dataKey={xAxisKey} stroke="rgba(255,255,255,0.4)" fontSize={9} tickLine={false} />
-                        <ReChartsYAxis stroke="rgba(255,255,255,0.4)" fontSize={9} tickLine={false} />
+                        <ReChartsCartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                        <ReChartsXAxis dataKey={xAxisKey} stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} angle={-20} textAnchor="end" height={45} tickMargin={6} tick={{ fill: 'rgba(255,255,255,0.5)', fontWeight: 600 }} />
+                        <ReChartsYAxis stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} width={40} tick={{ fill: 'rgba(255,255,255,0.5)', fontWeight: 600 }} />
                         <ReChartsTooltip 
-                          contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: 'rgba(16, 185, 129, 0.2)', borderRadius: '12px' }}
-                          labelStyle={{ color: '#fff', fontWeight: 'bold', fontSize: '10px' }}
-                          itemStyle={{ fontSize: '10px' }}
+                          contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: 'rgba(99, 102, 241, 0.25)', borderRadius: '16px', backdropFilter: 'blur(12px)', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.4)', padding: '10px 12px' }}
+                          labelStyle={{ color: '#94a3b8', fontWeight: 'bold', fontSize: '10px', marginBottom: '4px' }}
+                          itemStyle={{ fontSize: '10px', color: '#fff', fontWeight: 'bold' }}
                         />
-                        <ReChartsArea type="monotone" dataKey={yAxisKey} stroke="#10b981" strokeWidth={2} fillOpacity={1} fill={`url(#grad-${index})`} />
+                        <ReChartsBar dataKey={yAxisKey} fill={`url(#bar-grad-${index})`} radius={[5, 5, 0, 0]} opacity={0.9} />
+                      </ReChartsBarChart>
+                    ) : type === 'area' ? (
+                      <ReChartsAreaChart data={data} margin={{ top: 15, right: 15, left: 5, bottom: 20 }}>
+                        <defs>
+                          <linearGradient id={`area-grad-${index}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#10b981" stopOpacity={0.45}/>
+                            <stop offset="100%" stopColor="#10b981" stopOpacity={0.01}/>
+                          </linearGradient>
+                        </defs>
+                        <ReChartsCartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                        <ReChartsXAxis dataKey={xAxisKey} stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} angle={-20} textAnchor="end" height={45} tickMargin={6} tick={{ fill: 'rgba(255,255,255,0.5)', fontWeight: 600 }} />
+                        <ReChartsYAxis stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} width={40} tick={{ fill: 'rgba(255,255,255,0.5)', fontWeight: 600 }} />
+                        <ReChartsTooltip 
+                          contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: 'rgba(16, 185, 129, 0.25)', borderRadius: '16px', backdropFilter: 'blur(12px)', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.4)', padding: '10px 12px' }}
+                          labelStyle={{ color: '#94a3b8', fontWeight: 'bold', fontSize: '10px', marginBottom: '4px' }}
+                          itemStyle={{ fontSize: '10px', color: '#fff', fontWeight: 'bold' }}
+                        />
+                        <ReChartsArea type="monotone" dataKey={yAxisKey} stroke="#10b981" strokeWidth={2.5} fillOpacity={1} fill={`url(#area-grad-${index})`} />
                       </ReChartsAreaChart>
                     ) : (
-                      <ReChartsLineChart data={data} margin={{ top: 5, right: 10, left: -25, bottom: 5 }}>
-                        <ReChartsCartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                        <ReChartsXAxis dataKey={xAxisKey} stroke="rgba(255,255,255,0.4)" fontSize={9} tickLine={false} />
-                        <ReChartsYAxis stroke="rgba(255,255,255,0.4)" fontSize={9} tickLine={false} />
+                      <ReChartsLineChart data={data} margin={{ top: 15, right: 15, left: 5, bottom: 20 }}>
+                        <ReChartsCartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                        <ReChartsXAxis dataKey={xAxisKey} stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} angle={-20} textAnchor="end" height={45} tickMargin={6} tick={{ fill: 'rgba(255,255,255,0.5)', fontWeight: 600 }} />
+                        <ReChartsYAxis stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} width={40} tick={{ fill: 'rgba(255,255,255,0.5)', fontWeight: 600 }} />
                         <ReChartsTooltip 
-                          contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: 'rgba(59, 130, 246, 0.2)', borderRadius: '12px' }}
-                          labelStyle={{ color: '#fff', fontWeight: 'bold', fontSize: '10px' }}
-                          itemStyle={{ fontSize: '10px' }}
+                          contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: 'rgba(139, 92, 246, 0.25)', borderRadius: '16px', backdropFilter: 'blur(12px)', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.4)', padding: '10px 12px' }}
+                          labelStyle={{ color: '#94a3b8', fontWeight: 'bold', fontSize: '10px', marginBottom: '4px' }}
+                          itemStyle={{ fontSize: '10px', color: '#fff', fontWeight: 'bold' }}
                         />
-                        <ReChartsLine type="monotone" dataKey={yAxisKey} stroke="#3b82f6" strokeWidth={2.5} dot={{ r: 2 }} activeDot={{ r: 4 }} />
+                        <ReChartsLine type="monotone" dataKey={yAxisKey} stroke="#8b5cf6" strokeWidth={3} dot={{ r: 2.5, strokeWidth: 1.5, fill: '#8b5cf6' }} activeDot={{ r: 5 }} />
                       </ReChartsLineChart>
                     )}
                   </ResponsiveContainer>
